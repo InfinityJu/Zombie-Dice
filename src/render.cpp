@@ -41,17 +41,16 @@ std::string result_emoji(char r) {
  * 
  * @return A string containing the name of the winning player, or an empty string if no winner is found.
  */
-std::string get_winner(GameController gc){
+std::string get_winner(const GameController& gc){
     std::string winner;
     for (const auto& p : gc.Players) {
-        if (p.Brains >= gc.WinBrains) {
-            winner = p.Name;        
+        if (p->Brains >= gc.WinBrains) {
+            winner = p->Name;        
         }
     }
 
     return winner;
 }
-
 /**
  * @fn getNamesWidth
  * @brief Calculates the length of the longest player name in the current session.
@@ -68,7 +67,7 @@ count_t getNamesWidth(const GameController& gc) {
     count_t longest {0};
 
     for (const auto& p : gc.Players)
-        if (p.Name.size() > longest) longest = p.Name.size();
+        if (p->Name.size() > longest) longest = p->Name.size();
     return longest;
 }
 
@@ -185,14 +184,14 @@ void render_scoreboard(const GameController& gc) {
             for (size_t i = 0; i < gc.Players.size(); i++) {
                 const auto& p  = gc.Players[i];
 
-                std::cout << (p.Name == winner ? "🏆 " : "   ");
+                std::cout << (p->Name == winner ? "🏆 " : "   ");
         
-                std::cout << std::left << std::setw(getNamesWidth(gc)) << p.Name << ": ";
+                std::cout << std::left << std::setw(getNamesWidth(gc)) << p->Name << ": ";
 
                 for (count_t d = 0; d < SCORE_DOTS; d++)
-                    std::cout << (d < p.Brains ? "🧠 " : "🔸 ");
+                    std::cout << (d < p->Brains ? "🧠 " : "🔸 ");
         
-                std::cout << "│ (" << p.Brains << "), # turns played: " << p.turns << "\n";
+                std::cout << "│ (" << p->Brains << "), # turns played: " << p->turns << "\n";
             }
 
         } else{
@@ -202,13 +201,13 @@ void render_scoreboard(const GameController& gc) {
 
                 // Indicates who is playing
                 std::cout << (is_cur ? "> " : "  ");
-                std::cout << std::left << std::setw(COL_NAME) << (p.Name + ":");
+                std::cout << std::left << std::setw(COL_NAME) << (p->Name + ":");
                 std::cout << " ";
             
                 for (count_t d = 0; d < SCORE_DOTS; d++)
-                    std::cout << (d < p.Brains ? "🧠 " : "🔸 ");
+                    std::cout << (d < p->Brains ? "🧠 " : "🔸 ");
                 
-                std::cout << "│ (" << p.Brains << "), # turns played: " << p.turns << "\n";
+                std::cout << "│ (" << p->Brains << "), # turns played: " << p->turns << "\n";
             }
         }
 
@@ -231,7 +230,7 @@ void render_scoreboard(const GameController& gc) {
  */
 void render_turn_info(const GameController& gc) {
     if(gc.CurrStage != GameStage::Help){
-        std::cout << "Player: \"" << gc.Players[gc.currplayer_idx()].Name << "\""
+        std::cout << "Player: \"" << gc.Players[gc.currplayer_idx()]->Name << "\""
                 << " | Turn #: " << gc.Turn
                 << " | Bag has: " << gc.dice_in_bag() << " 🎲.\n\n";
     }
@@ -390,7 +389,7 @@ void render_message_area(const GameController& gc) {
             std::cout << "│\n";
         };
 
-        if (gc.CurrStage == GameStage::Play && gc.Players[gc.currplayer_idx()].bot == false) {
+        if (gc.CurrStage == GameStage::Play && gc.Players[gc.currplayer_idx()]->is_bot() == false) {
             if (gc.Board.Shots.size() >= 3) {
                 mline("You got shot 3 times! You lose all brains.");
                 mline("Press <enter> to continue.");
@@ -403,7 +402,7 @@ void render_message_area(const GameController& gc) {
                 mline("  -h or --help + <enter> - help table");
             }
             
-        } else if (gc.CurrStage == GameStage::Play && gc.Players[gc.currplayer_idx()].bot == true){
+        } else if (gc.CurrStage == GameStage::Play && gc.Players[gc.currplayer_idx()]->is_bot() == true){
         if (gc.Board.Shots.size() >= 3) {
                 mline("The bot got shot 3 times! It loses all brains.");
                 mline("Press <enter> to continue.");
@@ -414,14 +413,14 @@ void render_message_area(const GameController& gc) {
                 mline("  Q + <enter> - quit game");
             } 
 
-        } else if (gc.CurrStage == GameStage::Roll && gc.Players[gc.currplayer_idx()].bot == false) {
+        } else if (gc.CurrStage == GameStage::Roll && gc.Players[gc.currplayer_idx()]->is_bot() == false) {
             //Messages for when the dices have been rolled
             mline("Rolling outcome:");
             mline("  # brains you ate: " + std::to_string(gc.rolled_brains()));
             mline("  # shots that hit you: " + std::to_string(gc.rolled_shots()));
             mline("Press <enter> to continue.");
 
-        } else if (gc.CurrStage == GameStage::Roll && gc.Players[gc.currplayer_idx()].bot == true){
+        } else if (gc.CurrStage == GameStage::Roll && gc.Players[gc.currplayer_idx()]->is_bot() == true){
             mline("Rolling outcome:");
             mline("  # brains it ate: " + std::to_string(gc.rolled_brains()));
             mline("  # shots that hit it: " + std::to_string(gc.rolled_shots()));
@@ -442,7 +441,7 @@ void render_message_area(const GameController& gc) {
         std::string tied_players{""};
         for(int i = 0; i < gc.PlayerOrder.size(); i++){
             int idx = gc.PlayerOrder[i];
-            tied_players += " \"" + gc.Players[idx].Name + "\" ";
+            tied_players += " \"" + gc.Players[idx]->Name + "\" ";
         }
 
         if(tied_players.size() > 30) width = tied_players.size();
@@ -468,9 +467,9 @@ void render_message_area(const GameController& gc) {
         } else if(gc.CurrStage == GameStage::End){
             mline("Game over!");
             for (const auto& p : gc.Players) {
-                if (p.Brains >= gc.WinBrains) {
-                    mline("Winner: \"" + p.Name + "\" with "
-                        + std::to_string(p.Brains) + " brain(s)!");
+                if (p->Brains >= gc.WinBrains) {
+                    mline("Winner: \"" + p->Name + "\" with "
+                        + std::to_string(p->Brains) + " brain(s)!");
                 }
             }
         }
@@ -511,7 +510,7 @@ void GameController::render() {
     render_bsa(*this);
     render_message_area(*this);
 
-    if(Players[currplayer_idx()].bot == false && CurrStage != GameStage::End){
+    if(Players[currplayer_idx()]->is_bot() == false && CurrStage != GameStage::End){
         std::cout << "🧟> ";
     }
     else {

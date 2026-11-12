@@ -3,20 +3,49 @@
 
 #include "game_controller.hpp"
 
-/**
- * @brief Predefined pool of thematic and humorous zombie names allocated for automated AI bots.
- * 
- * @details Contains a fixed set of alphanumeric string literals used by the random name picker 
- * system during initialization. This array blends localized puns, classical name corruptions, 
- * and pop-culture references to give each instantiated AI entity a distinct identification label.
- */
+/// Array of possible zombie names
 const std::vector<std::string> ZombieNames = {
-    "Zombob", "Zombea", "Zumclides", "Gnarly",
+    "Zombob", "Zombea", "Zumclides", "Zales",
     "Zuis", "Zantonio", "Zantos", "Zabelo", "Youclides",
     "Zoiano", "Fiuk", "Braino", "Rogerio", "Zombeedo",
     "Zilar", "Zadalberto", "Zumba", "Zyago", "Zuuuhnan",
-    "Zidani", "Zureta", "Zombrina", "Zaza"
+    "Zidani", "Zureta", "Zombrina", "Zaza", "Zalvaro"
 };
+
+/**
+ * @enum BotDifficulty
+ * 
+ * @brief Represents the personalities of bot available in the game.
+ */
+enum class BotDifficulty{
+    UNDEF,
+    SMART,
+    COWARD,
+    RECKLESS,
+    GAMBLER
+};
+
+const std::vector<BotDifficulty> ZombieModes = {
+    BotDifficulty::COWARD, BotDifficulty::COWARD , BotDifficulty::COWARD, BotDifficulty::COWARD,
+    BotDifficulty::RECKLESS, BotDifficulty::RECKLESS, BotDifficulty::RECKLESS,
+    BotDifficulty::SMART, BotDifficulty::SMART,
+    BotDifficulty::GAMBLER
+};
+
+/**
+ * @class BotInfo
+ * @brief Extends PlayerInfo and stores individual bot information and statistics.
+ */
+class BotInfo : public PlayerInfo{
+public:
+    BotDifficulty botdifficulty{BotDifficulty::UNDEF};    //! The bot's personality
+    count_t riskyrolls{0};                                //! Special parameter for the reckless bot
+
+    bool is_bot() const { return true; }
+
+};
+
+// --- Bot Creation Functions -- //
 
 /**
  * @fn bot_name_picker
@@ -35,15 +64,15 @@ std::string bot_name_picker(std::mt19937& g);
 
 /**
  * @fn bot_difficulty_picker
- * @brief Selects a random zombie name from a predefined list to assign to an AI bot.
+ * @brief Selects a random difficulty for the zombie bot.
  * 
  * @details Utilizes a string to define the difficulty of a bot.
  *
  * @param g A reference to the active `std::mt19937` random engine used to shuffle the string.
  * 
- * @return 'c' for coward, 's' for smart, 'r' for reckless, 'g' for gambler.
+ * @return coward, smart, reckless or gambler.
  */
-char bot_difficulty_picker(std::mt19937& g);
+BotDifficulty bot_difficulty_picker(std::mt19937& g);
 
 /**
  * @fn create_zombie_bot
@@ -57,7 +86,7 @@ char bot_difficulty_picker(std::mt19937& g);
  * 
  * @return An initialized `PlayerInfo` struct representing the newly generated bot opponent.
  */
-PlayerInfo create_zombie_bot( std::mt19937& g );
+std::unique_ptr<PlayerInfo> create_zombie_bot( std::mt19937& g );
 
 /**
  * @fn bot_bout_to_lose
@@ -127,7 +156,7 @@ bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, c
  * it's next action through a coinflip.
  *
  * @param Board The active game board state containing current turn metrics (shots and brains buffers).
- * @param BotInfo The data structure tracking the bot's permanently accumulated scores and profile tags.
+ * @param BotData The data structure tracking the bot's permanently accumulated scores and profile tags.
  * @param WinPlayers The active tracker counting players who have already qualified for victory.
  * @param WinBrains The mandatory point threshold needed to secure a win in the match.
  * @param PlayerNum The number of total players at the begining of the match;
@@ -135,7 +164,7 @@ bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, c
  * 
  * @return A string representing the bot's action: `""` to roll again, or `"H"` to hold and bank its points.
  */
-std::string bot_processing( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains,
+std::string bot_processing( GameBoard Board, BotInfo& BotData, count_t WinPlayers, count_t WinBrains,
                             count_t PlayerNum, count_t PlayersPlaying );
 
 

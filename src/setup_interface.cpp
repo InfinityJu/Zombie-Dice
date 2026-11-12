@@ -94,7 +94,7 @@ void showGetPlayersMsg(GameConfig& cfg){
  * 
  * @return A vector of initialized `PlayerInfo` objects representing the validated participants.
  */
-std::vector<PlayerInfo> getPlayers(std::string input, GameConfig gc, std::vector<PlayerInfo>& players){
+std::vector<std::unique_ptr<PlayerInfo>> getPlayers(std::string input, GameConfig gc, std::vector<std::unique_ptr<PlayerInfo>>& players){
     std::stringstream ss(input);
     std::string segment;
 
@@ -106,14 +106,14 @@ std::vector<PlayerInfo> getPlayers(std::string input, GameConfig gc, std::vector
         // Só adiciona ao vetor se o nome não estiver vazio
         if (!name.empty()) {
             // Cria um novo elemento de PlayerInfo com o nome e valores padrão
-            PlayerInfo newplayer;
-            newplayer.Name = name;
-
-            players.push_back(newplayer);
+            auto newplayer = std::make_unique<PlayerInfo>();
+            newplayer->Name = name;
+            
+            players.push_back(std::move(newplayer));
         }
     }
     
-    return players;
+    return std::move(players);
 }
 
 /**
@@ -126,12 +126,12 @@ std::vector<PlayerInfo> getPlayers(std::string input, GameConfig gc, std::vector
  *
  * @param players A constant reference to the vector containing the registered player data.
  */
-void printPlayers(const std::vector<PlayerInfo>& players) {
+void printPlayers(const std::vector<std::unique_ptr<PlayerInfo>>& players) {
     std::cout << "\n>>> The players of the game are:" << std::endl;
     
     // Percorre o vetor de jogadores
     for (const auto& player : players) {
-        std::cout << "  \"" << player.Name << "\"" << std::endl;
+        std::cout << "  \"" << player->Name << "\"" << std::endl;
     }
     std::cout << std::endl;
 }
@@ -191,7 +191,7 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
                 for (int i = 0; i < GameCntrl.Config.bot_count; i++){
                     if(GameCntrl.Players.size() < GameCntrl.Config.max_players){
                         auto bot = create_zombie_bot(GameCntrl.Board.g);
-                        GameCntrl.Players.push_back(bot);
+                        GameCntrl.Players.push_back(std::move(bot));
                     }
                 }
             }
@@ -214,7 +214,7 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
             std::string number_bots;
 
             std::cout << "\nHow many bots do you wish to play against?\n"
-                    << ">>> ";
+                      << ">>> ";
             
             std::getline(std::cin, number_bots);
 
@@ -224,7 +224,7 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
                 for (int i = 0; i < GameCntrl.Config.bot_count; i++){
                     if(GameCntrl.Players.size() < GameCntrl.Config.max_players){
                         auto bot = create_zombie_bot(GameCntrl.Board.g);
-                        GameCntrl.Players.push_back(bot);
+                        GameCntrl.Players.push_back(std::move(bot));
                     }
                 }
             }
@@ -243,6 +243,6 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
 
     printPlayers(GameCntrl.Players);
 
-    std::cout << ">>> The player who will start the game is \"" << GameCntrl.Players[idx].Name << "\"\n"
+    std::cout << ">>> The player who will start the game is \"" << GameCntrl.Players[idx]->Name << "\"\n"
               << "Press <Enter> to start the match.\n" << std::endl;
 }

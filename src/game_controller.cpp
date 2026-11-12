@@ -145,24 +145,27 @@ void GameController::reset_board(){
  */
 void GameController::advance_player( bool dead = false ){
     int idx = currplayer_idx();
-    Players[idx].turns++;
+    Players[idx]->turns++;
 
-    if(idx == 0  && Players[idx].turns == 0){
-        Players[idx].turns++;
+    if(idx == 0  && Players[idx]->turns == 0){
+        Players[idx]->turns++;
     }
 
     if (!dead){
-        Players[idx].Brains += Board.total_brains();
+        Players[idx]->Brains += Board.total_brains();
     }
 
-    if (Players[idx].riskyrolls > 0){
-        Players[idx].riskyrolls = 0;
+    if (Players[idx]->is_bot()) {
+        BotInfo* bot = dynamic_cast<BotInfo*>(Players[idx].get());
+        if (bot && bot->riskyrolls > 0) {
+            bot->riskyrolls = 0;
+        }
     }
-
-    if (Players[idx].Brains == WinBrains){
+    
+    if (Players[idx]->Brains == WinBrains){
         WinPlayers++;
-    } else if (Players[idx].Brains > WinBrains){
-        WinBrains = Players[idx].Brains;
+    } else if (Players[idx]->Brains > WinBrains){
+        WinBrains = Players[idx]->Brains;
         WinPlayers = 1;
     }
 
@@ -195,7 +198,7 @@ count_t GameController::currplayer_idx() const {
  * @return A string containing the current player's name.
  */
 std::string GameController::currplayer_name() {
-    return Players[currplayer_idx()].Name;
+    return Players[currplayer_idx()]->Name;
 }
 
 /**
@@ -273,7 +276,7 @@ bool GameController::game_over( bool win = false ){
     for (int i = 0; i < PlayerOrder.size(); i++){
         auto idx = PlayerOrder[i];
 
-        if (Players[idx].turns < Turn){
+        if (Players[idx]->turns < Turn){
             return false;
         }
     }
@@ -328,7 +331,7 @@ void GameController::process_events( ConfigLoader gcnf ){
         while (runner != PlayerOrder.end()){
             auto idx = *runner;
 
-            if (Players[idx].Brains < WinBrains){
+            if (Players[idx]->Brains < WinBrains){
                 runner = PlayerOrder.erase(runner);
             } else {
                 runner++;
@@ -370,8 +373,11 @@ void GameController::update(){
 
         auto idx = PlayerOrder[CurrPlayer];
 
-        if (Players[idx].bot && op != "q" && op != "Q") {
-            op = bot_processing( Board, Players[idx], WinPlayers, WinBrains, PlayerNum, PlayerOrder.size() );
+        if (Players[idx]->is_bot() && op != "q" && op != "Q") {
+            BotInfo* bot = dynamic_cast<BotInfo*>(Players[idx].get());
+            if (bot) {
+                op = bot_processing( Board, *bot, WinPlayers, WinBrains, PlayerNum, PlayerOrder.size() );
+            }
         }
 
         if (op.empty()){

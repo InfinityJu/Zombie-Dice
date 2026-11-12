@@ -35,7 +35,7 @@ void showWellcomeScreen (GameConfig& cfg);
  * 
  * @return A vector of initialized `PlayerInfo` objects representing the validated participants.
  */
-std::vector<PlayerInfo> getPlayers(std::string input, GameConfig gc, std::vector<PlayerInfo>& players);
+std::vector<std::unique_ptr<PlayerInfo>> getPlayers(std::string input, GameConfig gc, std::vector<std::unique_ptr<PlayerInfo>>& players);
 
 /**
  * @fn printPlayers
@@ -47,7 +47,7 @@ std::vector<PlayerInfo> getPlayers(std::string input, GameConfig gc, std::vector
  *
  * @param players A constant reference to the vector containing the registered player data.
  */
-void printPlayers(const std::vector<PlayerInfo>& players);
+void printPlayers(const std::vector<std::unique_ptr<PlayerInfo>>& players);
 
 /**
  * @fn setupGame

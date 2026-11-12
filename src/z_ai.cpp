@@ -30,8 +30,8 @@ std::string bot_name_picker(std::mt19937& g){
  * 
  * @return 'c' for coward, 'r' for reckless, 's' for smart, 'g' for gambler.
  */
-char bot_difficulty_picker(std::mt19937& g){
-    std::string modes{"ccccrrrsssg"};
+BotDifficulty bot_difficulty_picker(std::mt19937& g){
+    auto modes = ZombieModes;
 
     std::shuffle(modes.begin(), modes.end(), g);
 
@@ -50,15 +50,15 @@ char bot_difficulty_picker(std::mt19937& g){
  * 
  * @return An initialized `PlayerInfo` struct representing the newly generated bot opponent.
  */
-PlayerInfo create_zombie_bot( std::mt19937& g ){
-    PlayerInfo NewBot;
+std::unique_ptr<PlayerInfo> create_zombie_bot( std::mt19937& g ){
+    auto NewBot = std::make_unique<BotInfo>();
     
-    NewBot.Name = bot_name_picker(g);
-    NewBot.bot = true;
-    if (NewBot.Name == "Rogerio"){
-        NewBot.botdifficulty = 's';
+    NewBot->Name = bot_name_picker(g);
+
+    if (NewBot->Name == "Rogerio"){
+        NewBot->botdifficulty = BotDifficulty::SMART;
     } else {
-        NewBot.botdifficulty = bot_difficulty_picker(g);
+        NewBot->botdifficulty = bot_difficulty_picker(g);
     }
 
     return NewBot;
@@ -82,7 +82,7 @@ PlayerInfo create_zombie_bot( std::mt19937& g ){
  * @return True if another player is in a winning position and the bot cannot match or beat the target 
  * score using its current turn assets; false otherwise.
  */
-bool bot_bout_to_lose( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains ){
+bool bot_bout_to_lose( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, count_t WinBrains ){
     if (WinPlayers == 0) return false;
 
     auto BotBrains = Board.total_brains() + BotInfo.Brains;
@@ -108,7 +108,7 @@ bool bot_bout_to_lose( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, 
  * 
  * @return True if the bot's combined current turn and banked scores match or surpass the victory cap; false otherwise.
  */
-bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains,
+bool bot_bout_to_win( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, count_t WinBrains,
                     count_t PlayerNum, count_t PlayersPlaying ){
     auto BotBrains = Board.total_brains() + BotInfo.Brains;
 
@@ -154,7 +154,7 @@ bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, c
  * 
  * @return A string representing the bot's action: `""` to roll again, or `"H"` to hold and bank its points.
  */
-std::string bot_processing( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains,
+std::string bot_processing( GameBoard Board, BotInfo& BotInfo, count_t WinPlayers, count_t WinBrains,
                             count_t PlayerNum, count_t PlayersPlaying ){
     if (bot_bout_to_lose(Board, BotInfo, WinPlayers, WinBrains)){
         return "";
@@ -171,7 +171,7 @@ std::string bot_processing( GameBoard Board, PlayerInfo BotInfo, count_t WinPlay
         return "";
     } 
 
-    if (BotInfo.botdifficulty == 's'){
+    if (BotInfo.botdifficulty == BotDifficulty::SMART){
         if (ShotsTaken == 1){
             if (BrainsToWin < (WinBrains * 0.66) || BrainsToWin < 3 || Board.total_brains() < 6){
                 return "";
@@ -182,11 +182,11 @@ std::string bot_processing( GameBoard Board, PlayerInfo BotInfo, count_t WinPlay
             if (Board.cur_Brains.size() < 3) return "";
             return "H";
         }
-    } else if (BotInfo.botdifficulty == 'c'){
+    } else if (BotInfo.botdifficulty == BotDifficulty::COWARD){
         if (ShotsTaken >= 1 || Board.total_brains() >=3){
             return "H";
         }
-    } else if (BotInfo.botdifficulty == 'r'){
+    } else if (BotInfo.botdifficulty == BotDifficulty::RECKLESS){
         if (ShotsTaken == 1 || Board.total_brains() > (BrainsToWin * 0.66)){
             if (BotInfo.riskyrolls < 3){
                 BotInfo.riskyrolls++;
@@ -201,7 +201,7 @@ std::string bot_processing( GameBoard Board, PlayerInfo BotInfo, count_t WinPlay
             }
             return "H";
         }
-    } else if (BotInfo.botdifficulty == 'g'){
+    } else if (BotInfo.botdifficulty == BotDifficulty::GAMBLER){
         std::uniform_int_distribution<int> coin_flip(0, 1);
 
         if (coin_flip(Board.g) == 1){

@@ -9,6 +9,7 @@
 #include <random>
 #include <map>
 #include <fstream>
+#include <memory>
 
 using count_t = unsigned long;
 
@@ -113,17 +114,19 @@ public:
 };
 
 /**
- * @struct PlayerInfo
- * 
+ * @class PlayerInfo
  * @brief Stores individual player information and statistics.
+ * 
+ * @fn bool is_bot
+ * @brief Helps the code identify if a player is a human or not
  */
-struct PlayerInfo{
-    std::string Name;
-    count_t Brains{0};
-    count_t turns{0};
-    bool bot{false};
-    char botdifficulty{'s'};
-    count_t riskyrolls{0};
+class PlayerInfo{
+public:
+    std::string Name;       //! Player's name
+    count_t Brains{0};      //! Brains conquered by the player
+    count_t turns{0};       //! Turns played by the player
+
+    virtual bool is_bot() const { return false; }
 };
 
 /**
@@ -310,7 +313,7 @@ struct GameBoard{
  * @return True if the game sequence should stop completely.
  */
 struct GameController{
-    std::vector<PlayerInfo> Players;
+    std::vector<std::unique_ptr<PlayerInfo>> Players;
     count_t PlayerNum{1};
     std::vector<count_t> PlayerOrder;
     count_t CurrPlayer{0};
