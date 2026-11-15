@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace AiTree {
+namespace pdt {
 
   inline std::mt19937& defaultRng() {
     std::mt19937 generator(std::random_device{}());
@@ -219,6 +219,38 @@ namespace AiTree {
       }
   };
 
-  //TODO fazer funções helper. Olhando o plano é possível ver quais faltam
-  
+  namespace helpers {
+
+    template <typename Context, typename Result, typename Pred>
+    NodePtr<Context, Result> decide(Pred&& pred, NodePtr<Context, Result> onTrue, NodePtr<Context, Result> onFalse) {
+        return std::make_unique<BinaryNode<Context, Result>>(std::forward<Pred>(pred), std::move(onTrue), std::move(onFalse));
+    }
+
+    template <typename Context, typename Result, typename Key, typename Selector>
+    std::unique_ptr<SwitchNode<Context, Result, Key>> switchOn(Selector&& selector, NodePtr<Context, Result> fallback = nullptr) {
+        return std::make_unique<SwitchNode<Context, Result, Key>>(std::forward<Selector>(selector), std::move(fallback));
+    }
+
+    template <typename Context, typename Result>
+    std::unique_ptr<ChanceNode<Context, Result>> chance() {
+        return std::make_unique<ChanceNode<Context, Result>>();
+    }
+
+    template <typename Context, typename Result, typename Rng = std::mt19937, typename Provider>
+    std::unique_ptr<ChanceNode<Context, Result, Rng>> chanceWithRng(Provider&& rngProvider) {
+        return std::make_unique<ChanceNode<Context, Result, Rng>>(std::forward<Provider>(rngProvider));
+    }
+
+    template <typename Context, typename Result, typename ProbFn, typename ThresholdOrFn>
+    NodePtr<Context, Result> probThreshold(ProbFn&& probFn, ThresholdOrFn&& threshold, 
+                                           NodePtr<Context, Result> onAboveOrEqual, NodePtr<Context, Result> onBelow) {
+        return std::make_unique<ProbabilityThresholdNode<Context, Result>>(std::forward<ProbFn>(probFn), std::forward<ThresholdOrFn>(threshold),
+                                                                           std::move(onAboveOrEqual), std::move(onBelow));
+    }
+
+    template <typename Context, typename Result, typename ValueOrFn>
+    NodePtr<Context, Result> leaf(ValueOrFn&& val) {
+        return std::make_unique<LeafNode<Context, Result>>(std::forward<ValueOrFn>(val));
+    }
+  }
 }
