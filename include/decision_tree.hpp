@@ -23,7 +23,7 @@
 
    O nó de chance é simples de ser explicado. Ele é citado no livro mencionado acima como um meio para que a IA de um jogo não pareça
    extremamente robótica, como se fosse apenas um amontoado de if-elses. Esse nó pode funcionar de dois modos. Um de chance fixa, isto é, cada
-   caminha tem uma chance fixa de ser rolado. Útil para o coin flip do bot gambler. 
+   caminho tem uma chance fixa de ser rolado. Útil para o coin flip do bot gambler. 
    Ou pode funcionar com chance dinâmica, esse nó funciona usando o contexto do jogo para calcular a chance dos caminhos possíveis, por exemplo, um bot que é mais inteligente tem mais chance de arriscar
    quando ele não toma nenhum tiro, mas ainda assim, tem chance de simplesmente tomar a decisão mais conservadora.
 
@@ -31,22 +31,26 @@
    esse nó pode ser Hold ou Roll. 
 
    O nó de decisão baseado em probabilidade é uma especialização do nó FloatDecision que é mencionado no livro acima.
-   Este nó é uma especialização do nó citado, funcionando para tomar decisões determinísticas sobre o jogo. A sua ideia se dá
-   em calcular as probabilidades do bot morrer ou viver. Esse valor será comparado com um "cutoff", um valor mínimo que diz o quão aceitável é 
-   se arriscar, um valor mais baixo aceita se arriscar mais, o cutoff, em um bot muito inteligente, esse valor não será fixo e será baseado na ideia de utilidade apresentada no livro:
+   Funcionando para tomar decisões determinísticas sobre o jogo. A sua ideia se dá em calcular as probabilidades do bot morrer ou viver. 
+   Esse valor será comparado com um "cutoff", um valor mínimo que diz o quão aceitável é se arriscar, um valor mais baixo aceita se arriscar mais. 
+   o cutoff, em um bot muito inteligente, não será fixo e será baseado na ideia de utilidade apresentada no livro:
    RUSSELL, Stuart; NORVIG, Peter. Artificial Intelligence: A Modern Approach. 4. ed. 2020
+   A ideia dessa "utilidade" é que, o bot em condições específicas, vai aceitar tomar maiores riscos, por exemplo, quando outro jogador está muitos pontos a frete do bot.
+   Ele será obrigado a assumir mais riscos.
 
    O livro mencionado logo acima apresenta árvores como a MiniMax e a ExpectMiniMax. Que apesar de serem ótimas bases de pensamento sobre como resolver o problema no zombie dice,
    não são capazes de integrar um bom bot para esse jogo, visto que a MiniMax não trabalha com jogos estocásticos, Zombie Dice usa a rolagem de dados para dar pontos.
    Já o ExpectMiniMax que apesar de trabalhar com chance e jogos estocásticos não funciona bem para jogos com muitos jogadores, além disso, o passo Min desse algoritmo, que
    busca reduzir a utilidade do oponente, é simplesmente negado, pois no Zombie Dice não há um modo de interferir no jogo do oponente, durante o turno de um jogador ele apenas pode mudar o próprio jogo.
-   
+
+   Outras referências:
+   CHARNES, Abraham; COOPER, William W. Chance-Constrained Programming. Management Science, v. 6, n. 1
 */
 
 namespace pdt {
 
   inline std::mt19937& defaultRng() {
-    std::mt19937 generator(std::random_device{}());
+    thread_local std::mt19937 generator(std::random_device{}());
     return generator;
   }
 
@@ -91,7 +95,7 @@ namespace pdt {
 
     public:
       explicit SwitchNode(std::function<Key(const Context&)> selector, NodePtr<Context, Result> fallback)
-        : keySelector(selector), defaultBranch(fallback) {
+        : keySelector(std::move(selector)), defaultBranch(std::move(fallback)) {
 
         if(!selector)
           throw std::invalid_argument("Error! SwitchNode must have a valid selector");  
@@ -112,7 +116,7 @@ namespace pdt {
 
         if (it != branches.end()) return it->second->evaluate(ctx);
 
-        if(defaultBranch) return defaultBranch->second->evaluate(ctx);
+        if(defaultBranch) return defaultBranch->evaluate(ctx);
 
         throw std::runtime_error("Error! SwitchNode did not find a valid branch nor a default is defined");
       }  
