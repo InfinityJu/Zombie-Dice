@@ -1,6 +1,6 @@
 #include "../include/game_bones.hpp"
 #include "../include/setup_interface.hpp"
-#include "../include/z_ai.hpp"
+#include "../include/ai_manager.hpp"
 
 #include <algorithm>
 #include <random>

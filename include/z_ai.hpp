@@ -5,7 +5,7 @@
 
 /// Array of possible zombie names
 const std::vector<std::string> ZombieNames = {
-    "Zombob", "Zombea", "Zumclides", "Zales",
+    "Zombob", "Zombea", "Zumclides", "Zales", "Vilarp",
     "Zuis", "Zantonio", "Zantos", "Zabelo", "Youclides",
     "Zoiano", "Fiuk", "Braino", "Rogerio", "Zombeedo",
     "Zilar", "Zadalberto", "Zumba", "Zyago", "Zuuuhnan",
@@ -41,7 +41,8 @@ public:
     BotDifficulty botdifficulty{BotDifficulty::UNDEF};    //! The bot's personality
     count_t riskyrolls{0};                                //! Special parameter for the reckless bot
 
-    bool is_bot() const { return true; }
+    bool is_bot()      const { return true; }
+    bool is_tree_bot() const { return false; }
 
 };
 
@@ -86,7 +87,7 @@ BotDifficulty bot_difficulty_picker(std::mt19937& g);
  * 
  * @return An initialized `PlayerInfo` struct representing the newly generated bot opponent.
  */
-std::unique_ptr<PlayerInfo> create_zombie_bot( std::mt19937& g );
+std::unique_ptr<PlayerInfo> create_if_else_bot( std::mt19937& g );
 
 /**
  * @fn bot_bout_to_lose
@@ -106,7 +107,7 @@ std::unique_ptr<PlayerInfo> create_zombie_bot( std::mt19937& g );
  * @return True if another player is in a winning position and the bot cannot match or beat the target 
  * score using its current turn assets; false otherwise.
  */
-bool bot_bout_to_lose( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains );
+bool bot_bout_to_lose( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, count_t WinBrains );
 
 /**
  * @fn bot_bout_to_win
@@ -121,13 +122,12 @@ bool bot_bout_to_lose( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, 
  * @param BotInfo The data structure tracking the bot's permanently accumulated scores and attributes.
  * @param WinPlayers The active tracker counting players who have qualified for victory conditions.
  * @param WinBrains The mandatory point threshold needed to secure a win in the match.
- * @param PlayerNum The number of total players at the begining of the match;
  * @param PlayersPlaying The number of players currently in the match;
  * 
  * @return True if the bot's combined current turn and banked scores match or surpass the victory cap; false otherwise.
  */
-bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, count_t WinBrains,
-                    count_t PlayerNum, count_t PlayersPlaying );
+bool bot_bout_to_win( GameBoard Board, BotInfo BotInfo, count_t WinPlayers,
+                    count_t WinBrains, count_t PlayersPlaying );
 
 /**
  * @fn bot_processing
@@ -164,7 +164,7 @@ bool bot_bout_to_win( GameBoard Board, PlayerInfo BotInfo, count_t WinPlayers, c
  * 
  * @return A string representing the bot's action: `""` to roll again, or `"H"` to hold and bank its points.
  */
-std::string bot_processing( GameBoard Board, BotInfo& BotData, count_t WinPlayers, count_t WinBrains,
+std::string bot_if_else_processing( GameBoard Board, BotInfo& BotData, count_t WinPlayers, count_t WinBrains,
                             count_t PlayerNum, count_t PlayersPlaying );
 
 

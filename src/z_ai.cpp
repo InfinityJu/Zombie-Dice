@@ -50,13 +50,15 @@ BotDifficulty bot_difficulty_picker(std::mt19937& g){
  * 
  * @return An initialized `PlayerInfo` struct representing the newly generated bot opponent.
  */
-std::unique_ptr<PlayerInfo> create_zombie_bot( std::mt19937& g ){
+std::unique_ptr<PlayerInfo> create_if_else_bot( std::mt19937& g ){
     auto NewBot = std::make_unique<BotInfo>();
     
     NewBot->Name = bot_name_picker(g);
 
     if (NewBot->Name == "Rogerio"){
         NewBot->botdifficulty = BotDifficulty::SMART;
+    } else if (NewBot->Name == "Vilarp"){
+        NewBot->botdifficulty = BotDifficulty::COWARD;
     } else {
         NewBot->botdifficulty = bot_difficulty_picker(g);
     }
@@ -108,8 +110,8 @@ bool bot_bout_to_lose( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, cou
  * 
  * @return True if the bot's combined current turn and banked scores match or surpass the victory cap; false otherwise.
  */
-bool bot_bout_to_win( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, count_t WinBrains,
-                    count_t PlayerNum, count_t PlayersPlaying ){
+bool bot_bout_to_win( GameBoard Board, BotInfo BotInfo, count_t WinPlayers,
+                    count_t WinBrains, count_t PlayersPlaying ){
     auto BotBrains = Board.total_brains() + BotInfo.Brains;
 
     if (WinPlayers > 0 && WinPlayers >= PlayersPlaying - 1){
@@ -154,13 +156,13 @@ bool bot_bout_to_win( GameBoard Board, BotInfo BotInfo, count_t WinPlayers, coun
  * 
  * @return A string representing the bot's action: `""` to roll again, or `"H"` to hold and bank its points.
  */
-std::string bot_processing( GameBoard Board, BotInfo& BotInfo, count_t WinPlayers, count_t WinBrains,
+std::string bot_if_else_processing( GameBoard Board, BotInfo& BotInfo, count_t WinPlayers, count_t WinBrains,
                             count_t PlayerNum, count_t PlayersPlaying ){
     if (bot_bout_to_lose(Board, BotInfo, WinPlayers, WinBrains)){
         return "";
     }
 
-    if (bot_bout_to_win(Board, BotInfo, WinPlayers, WinBrains, PlayerNum, PlayersPlaying)){
+    if (bot_bout_to_win(Board, BotInfo, WinPlayers, WinBrains, PlayersPlaying)){
         return "H";
     }
 
