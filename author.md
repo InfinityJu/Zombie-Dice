@@ -55,4 +55,4 @@ Preencha os itens que você implementou, indicando qual a nota esperada para cad
 
 Para compilar nosso programa a gente utilizou o g++ com o seguinte comando:
 
-g++ src/main.cpp src/game_controller.cpp src/setup_interface.cpp src/render.cpp src/z_ai.cpp src/ai_manager.cpp src/ai_tree.cpp -I./include -std=c++17 -o zdice
+g++ src/main.cpp src/game_controller.cpp src/setup_interface.cpp src/render.cpp src/z_ai.cpp src/ai_tree.cpp -I./include -std=c++17 -o zdice
