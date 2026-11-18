@@ -190,7 +190,8 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
             if (GameCntrl.Config.bot_count != 0 ){
                 for (int i = 0; i < GameCntrl.Config.bot_count; i++){
                     if(GameCntrl.Players.size() < GameCntrl.Config.max_players){
-                        auto bot = create_zombie_bot(GameCntrl.Board.g);
+                        auto botName = GameCntrl.bot_name_picker();
+                        auto bot = create_zombie_bot(botName, GameCntrl.Board.g);
                         GameCntrl.Players.push_back(std::move(bot));
                     }
                 }
@@ -223,9 +224,10 @@ void setupGame(ConfigLoader loader, GameController& GameCntrl, std::string playe
             if (GameCntrl.Config.bot_count != 0 ){
                 for (int i = 0; i < GameCntrl.Config.bot_count; i++){
                     if(GameCntrl.Players.size() < GameCntrl.Config.max_players){
-                        auto bot = create_zombie_bot(GameCntrl.Board.g);
+                        auto botName = GameCntrl.bot_name_picker();
+                        auto bot = create_zombie_bot(botName, GameCntrl.Board.g);
                         GameCntrl.Players.push_back(std::move(bot));
-                    }
+                    } else { break; }
                 }
             }
 

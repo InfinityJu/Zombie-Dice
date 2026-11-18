@@ -47,59 +47,65 @@ int main(int argc, char* argv[]) {
         SetConsoleOutputCP(CP_UTF8);
     #endif
 
-    std::string play{"Y"};
+    try{
+        std::string play{"y"};
 
-    while(play == "Y"){
-        play = "";
+        while(play == "y"){
+            play = "";
 
-        // Cleaning terminal for a better experience
-        #ifdef _WIN32
-            system("cls");
-        #else
-            system("clear");
-        #endif
+            // Cleaning terminal for a better experience
+            #ifdef _WIN32
+                system("cls");
+            #else
+                system("clear");
+            #endif
 
-        // 1. loads the Config
-        std::string configFile = "";
-        if (argc > 1) configFile = argv[1];
+            // 1. loads the Config
+            std::string configFile = "";
+            if (argc > 1) configFile = argv[1];
 
-        ConfigLoader loader;
-        loader.load(configFile);
+            ConfigLoader loader;
+            loader.load(configFile);
 
-        // 2. setup (shows the wellcome screen and gets the players names)
-        GameController gc;
-        gc.Config = loader.config;
-        gc.WinBrains = loader.config.brains_to_win;
+            // 2. setup (shows the wellcome screen and gets the players names)
+            GameController gc;
+            gc.Config = loader.config;
+            gc.WinBrains = loader.config.brains_to_win;
 
-        std::string players;
-        showWellcomeScreen (loader.config);
-        setupGame(loader, gc, players);
+            std::string players;
+            showWellcomeScreen (loader.config);
+            setupGame(loader, gc, players);
 
-        // 3. inicializes the dicebag and the order of the player
-        gc.initialize_dicebag(loader);
-        gc.reset_board();
+            // 3. inicializes the dicebag and the order of the player
+            gc.initialize_dicebag(loader);
+            gc.reset_board();
 
-        // 4. waits for the <enter> to start the game
-        std::cin.get();
+            // 4. waits for the <enter> to start the game
+            std::cin.get();
 
-        gc.render();
-
-        // 5. game loop
-        while (!gc.game_over(false)) {
-            gc.process_events(loader);
             gc.render();
-            gc.update();
+
+            // 5. game loop
+            while (!gc.game_over(false)) {
+                gc.process_events(loader);
+                gc.render();
+                gc.update();
+            }
+
+            // 6. final screen
+            gc.render();
+
+            std::cout << "\nDo you want to play again?\n"
+                    << "   Press Y + <end> for yes.\n"
+                    << "   Any other input will end the game.\n"
+                    << "🧟> ";
+
+            getline(std::cin, play);
+            play = to_lower(play);
         }
-
-        // 6. final screen
-        gc.render();
-
-        std::cout << "\nDo you want to play again?\n"
-                << "   Press Y + <end> for yes.\n"
-                << "   Any other input will end the game.\n"
-                << "🧟> ";
-
-        getline(std::cin, play);
+    } catch (const std::exception& e){
+        std::cerr << "\n[Fatal Error]: " << e.what() << "\n";
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

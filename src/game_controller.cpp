@@ -129,8 +129,21 @@ void GameController::reset_board(){
     Board.Shots.clear();
     Board.cur_Brains.clear();
     Board.extraBrains = 0;
+    reset_bot_names();
 };
 
+/**
+ * @fn GameController::reset_bot_names
+ * 
+ * @brief Resets the bot name pool to avoid bot_name_picker going out of bounds.
+ */
+void GameController::reset_bot_names(){
+    BotNames = ZombieNames;
+
+    if (BotNames.empty()){
+        throw std::runtime_error("No bot names found. Please reset game files and try again.");
+    }
+}
 
 /**
  * @fn GameController::advance_player
@@ -176,6 +189,33 @@ void GameController::advance_player( bool dead = false ){
     } else {
         CurrPlayer++;
     }
+}
+
+/**
+ * @fn bot_name_picker
+ * @brief Selects a random zombie name from a predefined list to assign to an AI bot.
+ * 
+ * @details Utilizes a uniform integer distribution mapped across the index range of the 
+ * global or accessible `ZombieNames` storage pool. The selection relies on an external 
+ * Pseudo-Random Number Generator engine (`std::mt19937`) to guarantee unbiased pseudo-randomness 
+ * and prevent duplicate pattern sequences across separate instances during initialization.
+ *
+ * @param g A reference to the active `std::mt19937` random engine used to generate the uniform distribution index.
+ * 
+ * @return A string containing the randomly selected zombie name.
+ */
+std::string GameController::bot_name_picker(){
+    if (BotNames.size() == 0){
+        reset_bot_names();
+    }
+
+    std::uniform_int_distribution<size_t> dist(0, BotNames.size() - 1);
+    
+    size_t randomIndex = dist(Board.g);
+    std::string chosenName = BotNames[randomIndex];
+    BotNames.erase(BotNames.begin() + randomIndex);
+
+    return chosenName;
 }
 
 /**

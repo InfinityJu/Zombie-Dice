@@ -13,6 +13,15 @@
 
 using count_t = unsigned long;
 
+/// Array of possible zombie names
+const std::vector<std::string> ZombieNames = {
+    "Zombob", "Zombea", "Zumclides", "Zales", "Vilarp",
+    "Zuis", "Zantonio", "Zantos", "Zabelo", "Youclides",
+    "Zoiano", "Fiuk", "Braino", "Rogerio", "Zombeedo",
+    "Zilar", "Zadalberto", "Zumba", "Zyago", "Zuuuhnan",
+    "Zidani", "Zureta", "Zombrina", "Zaza", "Zalvaro"
+};
+
 /**
  * @struct GameConfig
  * 
@@ -313,6 +322,7 @@ struct GameBoard{
  * @return True if the game sequence should stop completely.
  */
 struct GameController{
+    std::vector<std::string> BotNames = ZombieNames;
     std::vector<std::unique_ptr<PlayerInfo>> Players;
     count_t PlayerNum{1};
     std::vector<count_t> PlayerOrder;
@@ -332,8 +342,10 @@ struct GameController{
     void initialize_dicebag( ConfigLoader gcnf );
     void initialize_playerorder();
     void reset_board();
+    void reset_bot_names();
 
     std::string currplayer_name();
+    std::string bot_name_picker();
     count_t active_players();
     count_t currplayer_idx() const;
     count_t dice_in_bag() const;

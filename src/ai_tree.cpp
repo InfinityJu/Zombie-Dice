@@ -2,10 +2,9 @@
 
 // --- Bot Creation Functions -- //
 
-std::unique_ptr<PlayerInfo> create_tree_bot( std::mt19937& g ){
+std::unique_ptr<PlayerInfo> create_tree_bot( std::string botName, std::mt19937& g ){
     auto NewBot = std::make_unique<TreeBotInfo>();
-    
-    NewBot->Name = bot_name_picker(g);
+    NewBot->Name = botName;
 
     if (NewBot->Name == "Rogerio"){
         NewBot->botdifficulty = BotDifficulty::SMART;

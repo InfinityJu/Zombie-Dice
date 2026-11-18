@@ -51,7 +51,7 @@ BotNodePtr bot_tree_creator( const BotDifficulty& botdifficulty );
  * 
  * @return An initialized `PlayerInfo` struct representing the newly generated bot opponent.
  */
-std::unique_ptr<PlayerInfo> create_tree_bot( std::mt19937& g );
+std::unique_ptr<PlayerInfo> create_tree_bot( std::string botName, std::mt19937& g );
 
 
 // --- Methods -- //
