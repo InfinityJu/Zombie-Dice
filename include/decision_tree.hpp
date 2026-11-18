@@ -103,7 +103,7 @@ namespace pdt {
       explicit SwitchNode(std::function<Key(const Context&)> selector, NodePtr<Context, Result> fallback)
         : keySelector(std::move(selector)), defaultBranch(std::move(fallback)) {
 
-        if(!selector)
+        if(!keySelector)
           throw std::invalid_argument("Error! SwitchNode must have a valid selector");  
       }
 
