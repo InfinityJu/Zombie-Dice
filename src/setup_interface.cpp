@@ -50,7 +50,7 @@ void usage(GameConfig& cfg, const std::string& msg = ""){
 void showWellcomeScreen (GameConfig& cfg){
     std::string players;
 
-    std::cout << "         ---> Welcome to the Zombi Dice game (v 0.1) <--\n"
+    std::cout << "         ---> Welcome to the Zombie Dice game (v 0.1) <--\n"
               << "                -- copyright DIMAp/UFRN 2024-2026 --\n\n";
     
     usage(cfg);
