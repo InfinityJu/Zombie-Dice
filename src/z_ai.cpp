@@ -42,7 +42,9 @@ std::unique_ptr<PlayerInfo> create_if_else_bot( std::string BotName, std::mt1993
     } else if (NewBot->Name == "Vilarp"){
         NewBot->botdifficulty = BotDifficulty::COWARD;
     } else {
-        NewBot->botdifficulty = bot_difficulty_picker(g);
+        while( NewBot->botdifficulty == BotDifficulty::UNDEF || NewBot->botdifficulty == BotDifficulty::ZUPERZMART ){
+            NewBot->botdifficulty = bot_difficulty_picker(g);
+        }
     }
 
     return NewBot;

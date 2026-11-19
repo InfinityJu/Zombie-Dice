@@ -1,4 +1,4 @@
-#include "../include/ai_tree.hpp"
+#include "../include/zuper_zmart.hpp"
 
 // --- Bot Creation Functions -- //
 
@@ -120,6 +120,7 @@ BotNodePtr bot_tree_creator() {
     difficultySwitch->addCase(BotDifficulty::SMART, create_smart_tree());
     difficultySwitch->addCase(BotDifficulty::RECKLESS, create_reckless_tree());
     difficultySwitch->addCase(BotDifficulty::GAMBLER, create_gambler_tree());
+    difficultySwitch->addCase(BotDifficulty::ZUPERZMART, create_zuper_zmart_tree());
 
     // Regra de segurança inicial (0 tiros ou 0 cérebros)
     auto safeStartCheck = decide<BotContext, std::string>(
