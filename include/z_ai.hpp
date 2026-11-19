@@ -34,8 +34,8 @@ public:
     BotDifficulty botdifficulty{BotDifficulty::UNDEF};    //! The bot's personality
     count_t riskyrolls{0};                                //! Special parameter for the reckless bot
 
-    bool is_bot()      const { return true; }
-    bool is_tree_bot() const { return false; }
+    bool is_bot()              const { return true;  }
+    virtual bool is_tree_bot() const { return false; }
 
 };
 
