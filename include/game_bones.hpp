@@ -10,6 +10,8 @@
 #include <map>
 #include <fstream>
 #include <memory>
+#include <array>
+#include <algorithm>
 
 using count_t = unsigned long;
 
