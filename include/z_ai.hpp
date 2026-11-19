@@ -18,10 +18,6 @@ enum class BotDifficulty{
 };
 
 const std::vector<BotDifficulty> ZombieModes = {
-    BotDifficulty::COWARD, BotDifficulty::COWARD , BotDifficulty::COWARD, BotDifficulty::COWARD,
-    BotDifficulty::RECKLESS, BotDifficulty::RECKLESS, BotDifficulty::RECKLESS,
-    BotDifficulty::SMART, BotDifficulty::SMART,
-    BotDifficulty::GAMBLER,
     BotDifficulty::ZUPERZMART
 };
 
@@ -35,7 +31,7 @@ public:
     count_t riskyrolls{0};                                //! Special parameter for the reckless bot
 
     bool is_bot()      const { return true; }
-    bool is_tree_bot() const { return false; }
+    virtual bool is_tree_bot() const { return false; }
 
 };
 
