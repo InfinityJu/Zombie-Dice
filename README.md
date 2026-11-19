@@ -122,6 +122,16 @@ Or pass a custom `.ini` configuration file as a command-line argument:
 ./zdice zdice.ini
 ```
 
+### AI Simulator & Benchmarks
+
+To evaluate and compare the five Decision Tree AI personalities (`Coward`, `Reckless`, `Smart`, `Gambler`, and `ZuperZmart`), the project includes a standalone headless simulator (`src/simulator.cpp`) created by **Gabriel Brandão Vilar**. By default, it runs **100,000 automated bot-only matches** (`SEED = 1`, 2,000-turn limit per match) and logs each game's winner alongside overall win percentages.
+
+Compile and run the simulator from the project root:
+
+```bash
+g++ src/simulator.cpp src/game_controller.cpp src/ai_tree.cpp src/z_ai.cpp -I./include -std=c++17 -O2 -o simulator
+./simulator
+
 ---
 
 ## Configuration File (`.ini`)
@@ -201,13 +211,16 @@ Providing an empty line will end the game.
 │   ├── ai_tree.hpp          # Bot context and personality decision tree builders
 │   ├── zuper_zmart.hpp      # Hypergeometric probability model and utility function for ZuperZmart
 │   └── ai_manager.hpp       # Dispatcher between decision-tree bots and classic fallback logic
-└── src/
-    ├── main.cpp             # Entry point, exception handling, and replay loop
-    ├── game_controller.cpp  # Finite state machine, dice mechanics, turn progression, and tie-breaking
-    ├── setup_interface.cpp  # Interactive setup prompts and bot instantiation
-    ├── render.cpp           # ASCII/UTF-8 terminal UI rendering
-    ├── z_ai.cpp             # Imminent win/loss evaluators and classic bot rules
-    └── ai_tree.cpp          # Global decision tree instantiation and evaluation
+├── src/
+│   ├── main.cpp             # Entry point, exception handling, and replay loop
+│   ├── game_controller.cpp  # Finite state machine, dice mechanics, turn progression, and tie-breaking
+│   ├── setup_interface.cpp  # Interactive setup prompts and bot instantiation
+│   ├── render.cpp           # ASCII/UTF-8 terminal UI rendering
+│   ├── z_ai.cpp             # Imminent win/loss evaluators and classic bot rules
+│   ├── ai_tree.cpp          # Global decision tree instantiation and evaluation
+│   └── simulator.cpp        # Headless 100,000-game bot benchmark simulator
+└── proof.txt                # Benchmark output log with match-by-match winners and AI win percentages
+    
 ```
 
 ---
@@ -222,4 +235,5 @@ Providing an empty line will end the game.
 
 - **Annita Aquino Freitas** --- Front-end, CLI input parsing, error handling, and ASCII terminal UI rendering.
 - **Anthony Gabriel Gomes Rocha** --- Decision tree architecture and the "zuper zmart" AI bot.
+- **Gabriel Brandão Vilar** --- Automated headless bot simulator and AI win-rate benchmark validation (`proof.txt`).
 - **Júlia de Medeiros Borba** --- Back-end, game state machine, dice mechanics, and bot AI system.
