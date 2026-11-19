@@ -408,9 +408,8 @@ void render_message_area(const GameController& gc) {
                 mline("Press <enter> to continue.");
             } else {
                 // Messages for before the dice have been rolled if the CurrPlayer is a bot
-                mline("Ready to continue?");
-                mline("  <enter> - next play");
-                mline("  Q + <enter> - quit game");
+                mline("What will the bot do next?");
+                mline("  Please wait for the bot to continue.");
             } 
 
         } else if (gc.CurrStage == GameStage::Roll && gc.Players[gc.currplayer_idx()]->is_bot() == false) {
@@ -424,7 +423,7 @@ void render_message_area(const GameController& gc) {
             mline("Rolling outcome:");
             mline("  # brains it ate: " + std::to_string(gc.rolled_brains()));
             mline("  # shots that hit it: " + std::to_string(gc.rolled_shots()));
-            mline("Press <enter> to continue.");
+            mline("Please wait for the bot to continue.");
 
         } else if(gc.CurrStage == GameStage::ConfirmEnd) {
             mline("Are you sure you want to quit the game?");

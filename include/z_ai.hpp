@@ -18,6 +18,10 @@ enum class BotDifficulty{
 };
 
 const std::vector<BotDifficulty> ZombieModes = {
+    BotDifficulty::COWARD, BotDifficulty::COWARD , BotDifficulty::COWARD, BotDifficulty::COWARD,
+    BotDifficulty::RECKLESS, BotDifficulty::RECKLESS, BotDifficulty::RECKLESS,
+    BotDifficulty::SMART, BotDifficulty::SMART,
+    BotDifficulty::GAMBLER,
     BotDifficulty::ZUPERZMART
 };
 

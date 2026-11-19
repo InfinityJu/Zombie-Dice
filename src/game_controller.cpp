@@ -2,10 +2,6 @@
 #include "../include/setup_interface.hpp"
 #include "../include/ai_manager.hpp"
 
-#include <algorithm>
-#include <random>
-#include <sstream>
-
 /**
  * @fn printDiceFaces
  * @brief Retrieves the string representation of faces for a given die type based on configurations.
@@ -400,10 +396,22 @@ void GameController::process_events( ConfigLoader gcnf ){
  */
 void GameController::update(){
     std::string op;
-    std::getline(std::cin, op);
+
+    auto idx = PlayerOrder[CurrPlayer];
+    bool is_bot = Players[idx]->is_bot();
+
+    // only reads input if the player is a human or not in the help screen or attempting to end the game
+    if (!is_bot || CurrStage == GameStage::Help || CurrStage == GameStage::ConfirmEnd) {
+        std::getline(std::cin, op);
+    }
 
     //play -> used to manage the players actions
     if (CurrStage == GameStage::Play){
+        if (is_bot) {
+            std::cout << std::flush;
+            wait_seconds(2);
+        }
+
         if (Board.Shots.size() >= 3){
             advance_player( true );
             reset_board();
@@ -411,9 +419,7 @@ void GameController::update(){
             return;
         }
 
-        auto idx = PlayerOrder[CurrPlayer];
-
-        if (Players[idx]->is_bot() && op != "q" && op != "Q") {
+        if (is_bot && op != "q" && op != "Q") {
             BotInfo* bot = dynamic_cast<BotInfo*>(Players[idx].get());
             if (bot) {
                 op = bot_processing( Board, *bot, WinPlayers, WinBrains, PlayerNum, PlayerOrder.size() );
@@ -436,6 +442,11 @@ void GameController::update(){
     //roll -> goes back to play
     else if (CurrStage == GameStage::Roll){
         CurrStage = GameStage::Play;
+
+        if (is_bot) {
+            std::cout << std::flush;
+            wait_seconds(1.5);
+        }
     }
     
 

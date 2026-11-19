@@ -7,6 +7,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <sstream>
 #include <map>
 #include <fstream>
 #include <memory>
@@ -14,6 +15,24 @@
 #include <algorithm>
 
 using count_t = unsigned long;
+
+#ifdef _WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #include <windows.h>
+#else
+    #include <chrono>
+    #include <thread>
+#endif
+
+static void wait_seconds(double seconds) {
+#ifdef _WIN32
+    Sleep(seconds * 1000);
+#else
+    std::this_thread::sleep_for(std::chrono::seconds(seconds));
+#endif
+}
 
 /// Array of possible zombie names
 const std::vector<std::string> ZombieNames = {
